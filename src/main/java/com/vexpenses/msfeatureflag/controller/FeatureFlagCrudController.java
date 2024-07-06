@@ -1,0 +1,62 @@
+package com.vexpenses.msfeatureflag.controller;
+
+import com.vexpenses.msfeatureflag.model.Feature;
+import com.vexpenses.msfeatureflag.service.FeatureService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@Slf4j
+@RequestMapping("/v1/featureflag/crud")
+@Tag(name = "API para CRUD de Feature")
+public class FeatureFlagCrudController {
+
+    @Autowired
+    FeatureService featureService;
+
+    @PostMapping
+    @Operation(summary = "API Cadastro de Feature",
+            description = "Utilize esta API para cadastrar uma feature.")
+    public ResponseEntity<?> createFeatureFlag(@Valid @RequestBody Feature feature, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            for (ObjectError error : bindingResult.getAllErrors()) {
+                log.info("Validation: FeatureId: "+ feature.getFeatureId()
+                        +error.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body("Validação Falhou");
+        }
+        return ResponseEntity.ok(featureService.create(feature));
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping
+    @Operation(summary = "API para atualização de feature flag",
+            description = "Utilize passando o json da feature mantendo o mesmo FEATUREID")
+    public Feature updateFeature(@PathVariable String ulid, @RequestBody Feature feature) {
+        return featureService.update(feature);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping(value = "/{ulid}")
+    @Operation(summary = "API para deletar um feature flag.",
+            description = "Passe uma variável depath com o fetureId")
+    public void deleteFeatureById(@PathVariable String ulid) {
+        featureService.deleteById(ulid);
+    }
+
+    @GetMapping(value = "/{ulid}")
+    @Operation(summary = "API para consultar uma FeatureFlagPor ID",
+            description = "Passe uma variável depath com o fetureId")
+    public ResponseEntity<?> getFeatureById(@PathVariable String ulid) {
+        return ResponseEntity.ok(featureService.findById(ulid));
+    }
+
+}
