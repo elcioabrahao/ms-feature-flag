@@ -13,6 +13,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @Slf4j
 @RequestMapping("/v1/featureflag/crud")
@@ -25,14 +27,7 @@ public class FeatureFlagCrudController {
     @PostMapping
     @Operation(summary = "API Cadastro de Feature",
             description = "Utilize esta API para cadastrar uma feature.")
-    public ResponseEntity<?> createFeatureFlag(@Valid @RequestBody Feature feature, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            for (ObjectError error : bindingResult.getAllErrors()) {
-                log.info("Validation: FeatureId: "+ feature.getFeatureId()
-                        +error.getDefaultMessage());
-            }
-            return ResponseEntity.badRequest().body("Validação Falhou");
-        }
+    public ResponseEntity<?> createFeatureFlag(@RequestBody Feature feature) {
         return ResponseEntity.ok(featureService.create(feature));
     }
 
@@ -40,7 +35,7 @@ public class FeatureFlagCrudController {
     @PutMapping
     @Operation(summary = "API para atualização de feature flag",
             description = "Utilize passando o json da feature mantendo o mesmo FEATUREID")
-    public Feature updateFeature(@PathVariable String ulid, @RequestBody Feature feature) {
+    public Feature updateFeature(@RequestBody Feature feature) {
         return featureService.update(feature);
     }
 
@@ -56,7 +51,13 @@ public class FeatureFlagCrudController {
     @Operation(summary = "API para consultar uma FeatureFlagPor ID",
             description = "Passe uma variável depath com o fetureId")
     public ResponseEntity<?> getFeatureById(@PathVariable String ulid) {
-        return ResponseEntity.ok(featureService.findById(ulid));
+        Optional<Feature> featureOptional = featureService.findById(ulid);
+        if (!featureOptional.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }else{
+            return ResponseEntity.ok(featureOptional.get());
+        }
+
     }
 
 }

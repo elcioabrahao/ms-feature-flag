@@ -9,6 +9,7 @@ import java.util.List;
 @Repository
 public interface FeatureRepository extends CrudRepository<Feature, String> {
 
-    List<Feature> getFeatureByApplicationId(String applicationId);
+    List<Feature> findByApplicationIdAndStatus(String applicationId, boolean status);
+    List<Feature> findByApplicationIdAndStatusAndFilterType(String applicationId, boolean status, String filterType);
 
 }
