@@ -98,6 +98,8 @@ public class FeatureService {
             featureList = featureRepository.findAllByApplicationIdAndStatusAndFilterType(requestEntity.getApplicationId(),true,"USERID");
         } else if (requestEntity.getUserId().isEmpty() && !requestEntity.getCompanyId().isEmpty()) {
             featureList = featureRepository.findAllByApplicationIdAndStatusAndFilterType(requestEntity.getApplicationId(),true,"COMPANYID");
+        } else if (!requestEntity.getUserId().isEmpty() && !requestEntity.getCompanyId().isEmpty()){
+            featureList = featureRepository.findByApplicationIdAndStatus(requestEntity.getApplicationId(),true);
         } else {
             featureList = new ArrayList<>();
         }
@@ -122,6 +124,16 @@ public class FeatureService {
             if(!feature.getDateTimeEnd().isEmpty() && original){
                 original = DataUtil.dateIsAfterNow(feature.getDateTimeEnd());
                 message+="Feature "+feature.getFeatureId()+": Data de final vigência ultrapassada: "+feature.getDateTimeBegin();
+            }
+            if(!feature.getUserId().isEmpty() && original){
+                if(requestEntity.getUserId().equals(feature.getUserId()) && feature.isDefaultStateFlag()){
+                    allowedFeatures.add(feature.getFeatureId());
+                }
+            }
+            if(!feature.getCompanyId().isEmpty() && original){
+                if(requestEntity.getCompanyId().equals(feature.getCompanyId()) && feature.isDefaultStateFlag()){
+                    allowedFeatures.add(feature.getFeatureId());
+                }
             }
             if(!feature.getFilterId().isEmpty() && original){
                 filterOptional = filterService.getFilterById(feature.getFilterId());
