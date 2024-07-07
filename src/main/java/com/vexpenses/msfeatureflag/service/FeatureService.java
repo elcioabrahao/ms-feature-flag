@@ -1,6 +1,5 @@
 package com.vexpenses.msfeatureflag.service;
 
-import com.vexpenses.msfeatureflag.config.FilterType;
 import com.vexpenses.msfeatureflag.model.Feature;
 import com.vexpenses.msfeatureflag.model.Filter;
 import com.vexpenses.msfeatureflag.model.RequestEntity;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Slf4j
 public class FeatureService {
     @Autowired
     FeatureRepository featureRepository;
@@ -65,7 +63,7 @@ public class FeatureService {
             boolean original = true;
             if(!feature.getDateTimeBegin().isEmpty()){
                 original = DataUtil.dateIsBeforeNow(feature.getDateTimeBegin());
-            }else
+            }
             if(!feature.getDateTimeEnd().isEmpty() && original){
                 original = DataUtil.dateIsAfterNow(feature.getDateTimeEnd());
             }
@@ -74,10 +72,6 @@ public class FeatureService {
             }
             if(original){
                 if(feature.isDefaultStateFlag()){
-                    allowedFeatures.add(feature.getFeatureId());
-                }
-            } else{
-                if(!feature.isDefaultStateFlag()){
                     allowedFeatures.add(feature.getFeatureId());
                 }
             }
@@ -99,10 +93,11 @@ public class FeatureService {
         List<String> allowedFeatures =  new ArrayList<>();
         List<String> filtersApplied = new ArrayList<>();
         String message = "";
+        response.setFilterApplied(true);
         if(!requestEntity.getUserId().isEmpty() && requestEntity.getCompanyId().isEmpty()){
-            featureList = featureRepository.findByApplicationIdAndStatusAndFilterType(requestEntity.getApplicationId(), true, FilterType.USERID.name());
+            featureList = featureRepository.findAllByApplicationIdAndStatusAndFilterType(requestEntity.getApplicationId(),true,"USERID");
         } else if (requestEntity.getUserId().isEmpty() && !requestEntity.getCompanyId().isEmpty()) {
-            featureList = featureRepository.findByApplicationIdAndStatusAndFilterType(requestEntity.getApplicationId(), true, FilterType.COMPANYID.name());
+            featureList = featureRepository.findAllByApplicationIdAndStatusAndFilterType(requestEntity.getApplicationId(),true,"COMPANYID");
         } else {
             featureList = new ArrayList<>();
         }
@@ -112,6 +107,7 @@ public class FeatureService {
             response.setUserId(requestEntity.getUserId());
             response.setCompanyId(requestEntity.getCompanyId());
             response.setFilterAppliedIds(new ArrayList<>());
+            response.setFilterApplied(false);
             response.setSuccess(false);
             response.setErrorMessage("Não foram localizados features para esta requisição: "+requestEntity.toString());
             return response;
@@ -128,16 +124,16 @@ public class FeatureService {
                 message+="Feature "+feature.getFeatureId()+": Data de final vigência ultrapassada: "+feature.getDateTimeBegin();
             }
             if(!feature.getFilterId().isEmpty() && original){
-                filterOptional = filterService.getFilterById(feature.getFeatureId());
-                if(filterOptional.isPresent() && feature.getFilterType()==FilterType.USERID){
-                    if(filterOptional.get().getFilterList().contains(feature.getUserId())){
+                filterOptional = filterService.getFilterById(feature.getFilterId());
+                if(filterOptional.isPresent() && feature.getFilterType().equals("USERID")){
+                    if(filterOptional.get().getFilterList().contains(requestEntity.getUserId())){
                         if(filterOptional.get().isAllowAll() && original){
                             allowedFeatures.add(feature.getFeatureId());
                         }
                         filtersApplied.add(filterOptional.get().getFilterId());
                     }
-                }else if(filterOptional.isPresent() && feature.getFilterType()==FilterType.COMPANYID){
-                    if(filterOptional.get().getFilterList().contains(feature.getCompanyId())){
+                }else if(filterOptional.isPresent() && feature.getFilterType().equals("COMPANYID")){
+                    if(filterOptional.get().getFilterList().contains(requestEntity.getCompanyId())){
                         if(filterOptional.get().isAllowAll() && original){
                             allowedFeatures.add(feature.getFeatureId());
                         }

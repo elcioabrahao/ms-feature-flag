@@ -1,6 +1,5 @@
 package com.vexpenses.msfeatureflag.model;
 
-import com.vexpenses.msfeatureflag.config.FilterType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +18,7 @@ import java.io.Serializable;
 public class Feature implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
+    @Indexed
     private String featureId;           // Identificador único da feature
     private String name;                // Nome da feature
     private String description;         // Descrição da feature
@@ -33,7 +33,7 @@ public class Feature implements Serializable {
     private String companyId;           // Identificador da Empresa (opicional)
     private String filterId;            // Identificador do filtro a ser aplicado para modificar o comportamento padrão desta feature
     @Indexed
-    private FilterType filterType;      // Indica se o filtro e por empresa: COMPANYID ou por usuário USERID
+    private String filterType;          // Indica se o filtro e por empresa: COMPANYID ou por usuário USERID
     private String dateTimeBegin;       // Informa inicio da validade desta feature (opicional)
     private String dateTimeEnd;         // informa fim da validade desta feature (opicional)
     private String modifiedAt;           // data de criação ou modificação

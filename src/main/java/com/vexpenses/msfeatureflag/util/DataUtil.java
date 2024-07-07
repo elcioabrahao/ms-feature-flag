@@ -1,5 +1,7 @@
 package com.vexpenses.msfeatureflag.util;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -9,6 +11,7 @@ import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.Date;
 
+@Slf4j
 public class DataUtil {
 
     public static String getAgoraSomenteData(){

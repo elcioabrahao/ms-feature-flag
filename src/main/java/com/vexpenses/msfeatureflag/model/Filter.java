@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
 import java.io.Serializable;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class Filter implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
+    @Indexed
     private String filterId;            // Identificador único do filtro
     private String filterName;          // Nome do filtro
     private String filterType;          // Tipo do filtro USERID ou COMPANYID
