@@ -14,5 +14,5 @@ public interface FeatureRepository extends CrudRepository<Feature, String> {
 //    List<Feature> findByApplicationId(String applicationId);
     List<Feature> findByApplicationIdAndStatus(String applicationId, boolean status);
 //    List<Feature> findByApplicationIdAndStatusAndFilterType(String applicationId, boolean status, String filterType);
-
+    List<Feature> findByApplicationIdContainsIgnoreCaseOrNameContainsIgnoreCaseOrCategoryContainingIgnoreCaseOrTypeContainingIgnoreCase(String applicationId, String name, String category, String type);
 }

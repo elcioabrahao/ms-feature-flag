@@ -164,5 +164,8 @@ public class FeatureService {
         return response;
     }
 
+    public Iterable<Feature> findByValue(String value) {
+        return featureRepository.findByApplicationIdContainsIgnoreCaseOrNameContainsIgnoreCaseOrCategoryContainingIgnoreCaseOrTypeContainingIgnoreCase(value,value,value,value);
+    }
 
 }

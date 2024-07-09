@@ -1,19 +1,14 @@
 package com.vexpenses.msfeatureflag.controller;
 
 import com.vexpenses.msfeatureflag.model.Feature;
-import com.vexpenses.msfeatureflag.model.Filter;
 import com.vexpenses.msfeatureflag.service.FeatureService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -64,13 +59,24 @@ public class FeatureFlagCrudController {
     }
 
     @GetMapping(value = "/getallfeatures")
-    @Operation(summary = "API para consultar uma FeatureFlagPor ID",
+    @Operation(summary = "API para consultar uma FeatureFlag por ID",
             description = "Passe uma variável depath com o fetureId")
     public ResponseEntity<?> getAllFeatures() {
         Iterable<Feature> features = featureService.findAll();
         List<Feature> result = new ArrayList<>();
         features.forEach(result::add);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping(value = "/getfeatureby/{value}")
+    @Operation(summary = "API para consultar uma FeatureFlag por uma string",
+            description = "Passe uma variável depath com o fetureId")
+    public ResponseEntity<?> getFeatureByValue(@PathVariable String value) {
+        Iterable<Feature> features = featureService.findByValue(value);
+        List<Feature> result = new ArrayList<>();
+        features.forEach(result::add);
+        return ResponseEntity.ok(result);
+
     }
 
 }
