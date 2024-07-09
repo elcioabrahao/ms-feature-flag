@@ -62,9 +62,12 @@ public class FeatureFlagCrudController {
     @Operation(summary = "API para consultar uma FeatureFlag por ID",
             description = "Passe uma variável depath com o fetureId")
     public ResponseEntity<?> getAllFeatures() {
-        Iterable<Feature> features = featureService.findAll();
+        Iterable<Feature> features = featureService.findByFeatureIdNotNull(true);
         List<Feature> result = new ArrayList<>();
         features.forEach(result::add);
+        Iterable<Feature> features2 = featureService.findByFeatureIdNotNull(false);
+        features2.forEach(result::add);
+        log.info("Resposta: "+result.toString());
         return ResponseEntity.ok(result);
     }
 

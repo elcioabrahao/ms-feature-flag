@@ -22,8 +22,8 @@ public class FeatureService {
     @Autowired
     FilterService filterService;
 
-    public Iterable<Feature> findAll() {
-        return featureRepository.findAll();
+    public Iterable<Feature> findByFeatureIdNotNull(boolean status) {
+        return featureRepository.findByStatus(status);
     }
 
     public Optional<Feature> findById(String id) {
