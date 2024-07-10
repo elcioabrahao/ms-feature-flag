@@ -88,21 +88,14 @@ public class FeatureService {
     }
 
     public ResponseEntity getFeaturesByQuery(RequestEntity requestEntity) {
-        List<Feature> featureList;
+        List<Feature> featureList = new ArrayList<>();
         ResponseEntity response = new ResponseEntity();
         List<String> allowedFeatures =  new ArrayList<>();
         List<String> filtersApplied = new ArrayList<>();
         String message = "";
         response.setFilterApplied(true);
-        if(!requestEntity.getUserId().isEmpty() && requestEntity.getCompanyId().isEmpty()){
-            featureList = featureRepository.findAllByApplicationIdAndStatusAndFilterType(requestEntity.getApplicationId(),true,"USERID");
-        } else if (requestEntity.getUserId().isEmpty() && !requestEntity.getCompanyId().isEmpty()) {
-            featureList = featureRepository.findAllByApplicationIdAndStatusAndFilterType(requestEntity.getApplicationId(),true,"COMPANYID");
-        } else if (!requestEntity.getUserId().isEmpty() && !requestEntity.getCompanyId().isEmpty()){
-            featureList = featureRepository.findByApplicationIdAndStatus(requestEntity.getApplicationId(),true);
-        } else {
-            featureList = new ArrayList<>();
-        }
+        featureList.addAll(featureRepository.findByApplicationIdAndStatus(requestEntity.getApplicationId(),true));
+
         if(featureList.isEmpty()){
             response.setApplicationId(requestEntity.getApplicationId());
             response.setFeatureIds(new ArrayList<>());
@@ -117,24 +110,43 @@ public class FeatureService {
         for(Feature feature : featureList){
             boolean original = true;
             Optional<Filter> filterOptional;
+            // Verifica atual é anterior a data de inicio
             if(!feature.getDateTimeBegin().isEmpty()){
                 original = DataUtil.dateIsBeforeNow(feature.getDateTimeBegin());
                 message+="Feature "+feature.getFeatureId()+": Data de início vigência não atingida: "+feature.getDateTimeBegin();
             }
+            // verifica se a data atual é posterior a data de final
             if(!feature.getDateTimeEnd().isEmpty() && original){
                 original = DataUtil.dateIsAfterNow(feature.getDateTimeEnd());
                 message+="Feature "+feature.getFeatureId()+": Data de final vigência ultrapassada: "+feature.getDateTimeBegin();
             }
-            if(!feature.getUserId().isEmpty() && original){
+            // verifica se é necessário veirifcar uma regra para um usuário individual
+            if(!feature.getUserId().isEmpty()
+                    && feature.getCompanyId().isEmpty()
+                    && original){
                 if(requestEntity.getUserId().equals(feature.getUserId()) && feature.isDefaultStateFlag()){
                     allowedFeatures.add(feature.getFeatureId());
                 }
             }
-            if(!feature.getCompanyId().isEmpty() && original){
+            // verifica se é necessário veirificar uma empresa individual
+            if(!feature.getCompanyId().isEmpty()
+                    && feature.getUserId().isEmpty()
+                    && original){
                 if(requestEntity.getCompanyId().equals(feature.getCompanyId()) && feature.isDefaultStateFlag()){
                     allowedFeatures.add(feature.getFeatureId());
                 }
             }
+            // verifica se é necessário veirificar uma empresa mais usuário
+            if(!feature.getCompanyId().isEmpty()
+                    && !feature.getUserId().isEmpty()
+                    && original){
+                if(requestEntity.getCompanyId().equals(feature.getCompanyId())
+                        && requestEntity.getUserId().equals(feature.getUserId())
+                        && feature.isDefaultStateFlag()){
+                    allowedFeatures.add(feature.getFeatureId());
+                }
+            }
+            // Existe um ID de filtro associado a Feature e deve ser verificado se contem o ID do Usuário ou Compania dependento de seu tipo de filtro
             if(!feature.getFilterId().isEmpty() && original){
                 filterOptional = filterService.getFilterById(feature.getFilterId());
                 if(filterOptional.isPresent() && feature.getFilterType().equals("USERID")){
@@ -152,6 +164,14 @@ public class FeatureService {
                         filtersApplied.add(filterOptional.get().getFilterId());
                     }
                 }
+            }
+            // Id do filtro está vazio mais existe uma feature genérica
+            if(feature.getFilterId().isEmpty()
+                    && original
+                    && feature.isDefaultStateFlag()
+                    && feature.getUserId().isEmpty()
+                    && feature.getCompanyId().isEmpty()){
+                allowedFeatures.add(feature.getFeatureId());
             }
         }
         response.setApplicationId(requestEntity.getApplicationId());
