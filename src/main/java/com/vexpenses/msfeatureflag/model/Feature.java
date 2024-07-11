@@ -51,6 +51,16 @@ public class Feature implements Serializable {
     private String dateTimeBegin;       // Informa inicio da validade desta feature (opicional)
     @Schema(description = "Informa fim da validade desta feature (opicional)")
     private String dateTimeEnd;         // Informa fim da validade desta feature (opicional)
+    @Schema(description = "True para feature tipo Teste AB (padrão false)")
+    private boolean testAB;             //  true se é um teste AB, false se não for.
+    @Schema(description = "Probalidade para que seja retornado TRUE (permitido) no teste AB, obrigatório se testeAB estiver TRUE")
+    private double probabilityToAllow;  // probabilidade para retornar TRUE para permitido no teste AB (obrigadorio se testeAB for) padrão: 0.5.
+    @Schema(description = "True se é uma feature para migração de empresas (padrão false)")
+    private boolean migration;
+    @Schema(description = "Quantidade total de empresas a serem migradas")
+    private int totalOfCompanies;
+    @Schema(description = "Porcentagem de empresas a serem migradas (número ente 0.0 a 1.0)")
+    private double migrationPercentage;
     @Schema(description = "Data de criação ou modificação")
     private String modifiedAt;           // Data de criação ou modificação
 }
