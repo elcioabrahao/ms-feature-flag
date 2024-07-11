@@ -1,0 +1,19 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "Aplicação de feature flag para VExpenses.",
+    "version" : "v1",
+    "title" : "VExpenses - Feature Flag App",
+    "contact" : {
+      "name" : "Arquitetura",
+      "email" : "elcioabrahao@alumni.usp.br"
+    },
+    "license" : {
+      "name" : "Apache 2.0",
+      "url" : "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host" : "vexpenses.com",
+  "basePath" : "/",
+  "schemes" : [ "http", "https" ]
+}

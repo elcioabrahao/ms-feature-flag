@@ -75,7 +75,12 @@
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.5.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.0</version>
+            <scope>provided</scope>
+        </dependency>
 
     </dependencies>
 
@@ -109,6 +114,7 @@
                             <schemes>http,https</schemes>
                             <host>vexpenses.com</host>
                             <basePath>/</basePath>
+                            <outputFormats>json</outputFormats>
                             <info>
                                 <title>VExpenses - Feature Flag App</title>
                                 <version>v1</version>
