@@ -15,11 +15,11 @@ import java.io.Serializable;
 @Builder
 public class RequestEntity implements Serializable {
 
-    @Schema(description = "Identificado da aplicação corrente (conforme criado no registro de feature)")
+    @Schema(name="applicationId", example="web01", description = "Identificado da aplicação corrente (conforme criado no registro de feature)")
     private String applicationId;
-    @Schema(description = "Identificador do usuário (mesmo formato da lista de allow all/denny all)")
+    @Schema(name="userId", example="KSFSKFHKSFSFHKSFH", description = "Identificador do usuário (mesmo formato da lista de allow all/denny all)")
     private String userId;
-    @Schema(description = "Identificador de empresa (mesmo formato da lista de allow all/denny all)")
+    @Schema(name="companyId", example="43098758000179", description = "Identificador de empresa (mesmo formato da lista de allow all/denny all)")
     private String companyId;
 
 }
